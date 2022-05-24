@@ -1,0 +1,57 @@
+name: QtCompile-CI
+
+env: 
+  qt_ver:    "5.15.4"
+  qt_type:   shared
+  qt_arch:   "win64_mingw81"
+  
+on:
+  push:
+    tags: '*'
+
+jobs:
+  QtOnlineBuild:
+    runs-on: windows-latest
+    steps:
+    
+    - name: Install correct version of Environment
+      run: |
+        #choco uninstall mingw --force
+        #choco uninstall strawberryperl
+        #choco uninstall python
+        #choco install mingw --x64 --version=8.1.0 
+        #choco install strawberryperl --version=5.26.3.1
+        #choco install python --version 3.6.2
+
+    - name: Download Source
+      shell: cmd
+      run: |
+        curl -L -o qt-everywhere-opensource-src-${{ env.qt_ver }}.zip https://download.qt.io/official_releases/qt/5.15/${{ env.qt_ver }}/single/qt-everywhere-opensource-src-${{ env.qt_ver }}.zip
+        7z x -y qt-everywhere-opensource-src-${{ env.qt_ver }}.zip -oC:\
+        rm qt-everywhere-opensource-src-${{ env.qt_ver }}.zip
+        mv C:\qt-everywhere-src-${{ env.qt_ver }} C:\qt5
+        dir C:\qt5
+        
+    - name: Build
+      run: |
+        mkdir C:\qt5_shadow
+        cd C:\qt5_shadow
+        ..\qt5\configure.bat -${{ env.qt_type }} -debug-and-release -opensource -confirm-license -optimize-size -platform win32-g++ -prefix "D:\Qt5_binaries" -qt-sqlite -qt-pcre -qt-zlib -qt-libpng -qt-libjpeg -qt-doubleconversion -opengl desktop -no-openssl -ssl -schannel -nomake tests -nomake examples -no-compile-examples -no-feature-geoservices_mapboxgl -make tools -skip qt3d -skip qtactiveqt -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d -skip qtdoc -skip qtgamepad  -skip qtgraphicaleffects -skip qtlottie  -skip qtmultimedia -skip qtnetworkauth -skip qtpurchasing -skip qtquicktimeline -skip qtremoteobjects -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus  -skip qtspeech -skip qtquick3d -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebview -skip qtwebengine
+        mingw32-make -j2
+        mingw32-make install
+
+    - name: Package
+      env:
+        archiveName: qt-${{ env.qt_ver }}-${{ env.qt_type }}-${{ env.qt_arch }}
+      run: |
+        7z a ${{env.archiveName}}.zip D:\Qt5_binaries
+          
+    - name: Release
+      env:
+        archiveName: qt-${{ env.qt_ver }}-${{ env.qt_type }}-${{ env.qt_arch }}
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        body_path: C:\qt5_shadow\config.summary
+        files: |
+          ${{env.archiveName}}.zip
