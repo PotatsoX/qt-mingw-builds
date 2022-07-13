@@ -36,7 +36,7 @@ jobs:
       run: |
         mkdir C:\qt5_shadow
         cd C:\qt5_shadow
-        ..\qt5\configure.bat -${{ env.qt_type }} -debug-and-release -opensource -confirm-license -optimize-size -platform win32-g++ -prefix "D:\Qt5_binaries" -qt-sqlite -qt-pcre -qt-zlib -qt-libpng -qt-libjpeg -qt-doubleconversion -opengl desktop -no-openssl -ssl -schannel -nomake tests -nomake examples -no-compile-examples -no-feature-geoservices_mapboxgl -make tools -skip qt3d -skip qtactiveqt -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d -skip qtdoc -skip qtgamepad  -skip qtgraphicaleffects -skip qtlottie  -skip qtmultimedia -skip qtnetworkauth -skip qtpurchasing -skip qtquicktimeline -skip qtremoteobjects -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus  -skip qtspeech -skip qtquick3d -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebview -skip qtwebengine
+        ..\qt5\configure.bat -${{ env.qt_type }} -debug-and-release -opensource -confirm-license -optimize-size -platform win32-g++ -prefix "D:\Qt5_binaries" -qt-sqlite -qt-pcre -qt-zlib -qt-libpng -qt-libjpeg -qt-doubleconversion -opengl desktop -no-openssl -ssl -schannel -nomake tests -nomake examples -no-compile-examples -no-feature-geoservices_mapboxgl -make tools -skip qt3d -skip qtactiveqt -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d -skip qtdoc -skip qtgamepad  -skip qtlottie  -skip qtmultimedia -skip qtnetworkauth -skip qtpurchasing -skip qtquicktimeline -skip qtremoteobjects -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus  -skip qtspeech -skip qtquick3d -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebview -skip qtwebengine
         mingw32-make -j2
         mingw32-make install
 
