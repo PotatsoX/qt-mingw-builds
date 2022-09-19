@@ -1,7 +1,7 @@
 name: QtCompile-CI
 
 env: 
-  qt_ver:    "5.15.5"
+  qt_ver:    "5.15.6"
   qt_type:   shared
   qt_arch:   "win64_mingw81"
   
