@@ -34,8 +34,8 @@ jobs:
     
     - name: Modify qfilesystemengine_win.cpp
       run: |
-        sed -i 's/#if defined(Q_CC_MINGW) && WINVER < 0x0602/#if defined(Q_CC_MINGW) && WINVER < 0x0602 \&\& !(_WIN32_WINNT >= _WIN32_WINNT_WIN8)/' C:/qt5/qtbase/src/corelib/io/qfilesystemengine_win.cpp
-    
+        sed -i 's/^#if defined(Q_CC_MINGW) && WINVER < 0x0602/#if defined(Q_CC_MINGW) \&\& WINVER < 0x0602 \&\& !(_WIN32_WINNT >= _WIN32_WINNT_WIN8)/' C:/qt5/qtbase/src/corelib/io/qfilesystemengine_win.cpp
+
     - name: Build
       run: |
         mkdir C:\qt5_shadow
