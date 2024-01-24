@@ -23,6 +23,23 @@ jobs:
         #choco install strawberryperl --version=5.26.3.1
         #choco install python --version 3.6.2
 
+    - name: Add fxc bin to GITHUB_PATH
+      run: |
+        Get-Childitem -Path "C:\Program Files (x86)\Windows Kits\10\bin\**\x64\fxc.exe" `
+        | Sort-Object -Property LastWriteTime -Descending `
+        | Select-Object -First 1 `
+        | Split-Path -Parent `
+        | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
+      shell: powershell
+
+    - name: Add fxc bin to PATH
+      run: |
+        $newPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "fxc.exe" -Recurse | Select-Object -First 1 | Split-Path -Parent
+        $existingPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+        $newPath = $existingPath + ";" + $newPath
+        [Environment]::SetEnvironmentVariable("PATH", $newPath, "Machine")
+      shell: powershell
+  
     - name: Download Source
       shell: cmd
       run: |
@@ -31,11 +48,6 @@ jobs:
         rm qt-everywhere-opensource-src-${{ env.qt_ver }}.zip
         mv C:\qt-everywhere-src-${{ env.qt_ver }} C:\qt5
         dir C:\qt5
-    
-    - name: Add Windows Kits bin directory to PATH
-      run: |
-        $newPath = "${env:Path};C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64"
-        [Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
         
     - name: Modify qfilesystemengine_win.cpp
       run: |
