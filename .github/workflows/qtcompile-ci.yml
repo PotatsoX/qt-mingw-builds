@@ -32,6 +32,11 @@ jobs:
         mv C:\qt-everywhere-src-${{ env.qt_ver }} C:\qt5
         dir C:\qt5
     
+    - name: Add Windows Kits bin directory to PATH
+      run: |
+        $newPath = "${env:Path};C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64"
+        [Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
+        
     - name: Modify qfilesystemengine_win.cpp
       run: |
         sed -i 's/^#if defined(Q_CC_MINGW) && WINVER < 0x0602/#if defined(Q_CC_MINGW) \&\& WINVER < 0x0602 \&\& !(_WIN32_WINNT >= _WIN32_WINNT_WIN8)/' C:/qt5/qtbase/src/corelib/io/qfilesystemengine_win.cpp
