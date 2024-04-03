@@ -53,6 +53,17 @@ jobs:
       run: |
         sed -i 's/^#if defined(Q_CC_MINGW) && WINVER < 0x0602/#if defined(Q_CC_MINGW) \&\& WINVER < 0x0602 \&\& !(_WIN32_WINNT >= _WIN32_WINNT_WIN8)/' C:/qt5/qtbase/src/corelib/io/qfilesystemengine_win.cpp
 
+    - name: Fix D3D12 issue
+      run: |
+        git diff --no-index --patch-with-stat -- \
+          C:/qt5/qtdeclarative/src/plugins/scenegraph/d3d12/qsgd3d12engine.cpp
+        
+        sed -i "s/_uuidof/__uuidof/g" \
+          C:/qt5/qtdeclarative/src/plugins/scenegraph/d3d12/qsgd3d12engine.cpp
+        
+        git diff --no-index --patch-with-stat -- \
+          C:/qt5/qtdeclarative/src/plugins/scenegraph/d3d12/qsgd3d12engine.cpp
+          
     - name: Build
       run: |
         mkdir C:\qt5_shadow
