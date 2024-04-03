@@ -55,14 +55,7 @@ jobs:
 
     - name: Fix D3D12 issue
       run: |
-        git diff --no-index --patch-with-stat -- \
-          C:/qt5/qtdeclarative/src/plugins/scenegraph/d3d12/qsgd3d12engine.cpp
-        
-        sed -i "s/_uuidof/__uuidof/g" \
-          C:/qt5/qtdeclarative/src/plugins/scenegraph/d3d12/qsgd3d12engine.cpp
-        
-        git diff --no-index --patch-with-stat -- \
-          C:/qt5/qtdeclarative/src/plugins/scenegraph/d3d12/qsgd3d12engine.cpp
+        sed -i "s/_uuidof/__uuidof/g" C:/qt5/qtdeclarative/src/plugins/scenegraph/d3d12/qsgd3d12engine.cpp
           
     - name: Build
       run: |
