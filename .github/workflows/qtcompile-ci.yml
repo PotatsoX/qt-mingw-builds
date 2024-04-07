@@ -11,7 +11,7 @@ on:
 
 jobs:
   QtOnlineBuild:
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
     
     - name: Install correct version of Environment
