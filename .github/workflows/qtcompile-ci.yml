@@ -34,11 +34,41 @@ jobs:
     # 安装 MinGW810_64    
     - name: Setup MinGW64
       run: |
-        cd ..  #Directory: D:\a\buildQt
+        cd ..  # Directory: D:\a\buildQt
         mkdir -p mingw64
-        curl -L -o 8.1.0-release-posix-seh.7z https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/tools_mingw81/qt.tools.win64_mingw810/8.1.0-1-202411201005x86_64-8.1.0-gdb-11.2.0-release-posix-seh-rt_v6-rev0.7z
-        7z x D:\a\buildQt\8.1.0-release-posix-seh.7z -oD:\a\buildQt\mingw64
-
+        
+        # Download with retry and verification
+        $maxAttempts = 3
+        $attempt = 1
+        $downloaded = $false
+        
+        while ($attempt -le $maxAttempts -and -not $downloaded) {
+          Write-Host "Download attempt $attempt of $maxAttempts"
+          curl -L -o 8.1.0-release-posix-seh.7z `
+            "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/tools_mingw81/qt.tools.win64_mingw810/8.1.0-1-202411201005x86_64-8.1.0-gdb-11.2.0-release-win64.7z"
+          
+          # Verify file exists and has content
+          if ((Test-Path "8.1.0-release-posix-seh.7z") -and ((Get-Item "8.1.0-release-posix-seh.7z").Length -gt 1000000)) {
+            $downloaded = $true
+            Write-Host "Download successful"
+          } else {
+            Write-Host "Download failed or incomplete, retrying..."
+            if (Test-Path "8.1.0-release-posix-seh.7z") { Remove-Item "8.1.0-release-posix-seh.7z" }
+            $attempt++
+          }
+        }
+        
+        if (-not $downloaded) {
+          Write-Error "Failed to download MinGW after $maxAttempts attempts"
+          exit 1
+        }
+        
+        # Extract
+        7z x "D:\a\buildQt\8.1.0-release-posix-seh.7z" -o"D:\a\buildQt\mingw64"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "7z extraction failed with exit code $LASTEXITCODE"
+          exit 1
+        }
     # 构建Qt
     - name: Build Qt
       run: |
