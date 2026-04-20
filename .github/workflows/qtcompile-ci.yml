@@ -41,6 +41,13 @@ jobs:
         mkdir -p mingw64
         curl -L -o 8.1.0-release-posix-seh.7z https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/tools_mingw81/qt.tools.win64_mingw810/8.1.0-1-202411201005x86_64-8.1.0-gdb-11.2.0-release-posix-seh-rt_v6-rev0.7z
         7z x D:\a\${{ env.REPO_NAME }}\8.1.0-release-posix-seh.7z -oD:\a\${{ env.REPO_NAME }}\mingw64
+
+    # 安装 Windows SDK (包含 fxc.exe 用于编译 DirectX shaders)
+    - name: Setup Windows SDK
+      uses: azure/setup-sdk@v1
+      with:
+        version: 1.0.8
+        use-roslyn: false
         
     # 构建Qt
     - name: Build Qt
@@ -75,6 +82,17 @@ jobs:
 
         # 补充设置qtbase\bin和gnuwin32\bin
         $env:PATH = "$srcQt\qtbase\bin;$srcQt\gnuwin32\bin;$env:PATH"
+        
+        # 查找Windows SDK中的fxc.exe并添加到PATH
+        $sdkBinPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Directory -ErrorAction SilentlyContinue | 
+                      Where-Object { $_.Name -match '^10\.' } | 
+                      Sort-Object { [version]($_.Name -replace '^10\.', '') -Descending } | 
+                      Select-Object -First 1 | 
+                      ForEach-Object { Join-Path $_.FullName "x64" }
+        if ($sdkBinPath -and (Test-Path "$sdkBinPath\fxc.exe")) {
+            $env:PATH = "$sdkBinPath;$env:PATH"
+            Write-Host "Added Windows SDK bin to PATH: $sdkBinPath"
+        }
 
         # 设置安装文件夹目录
         $installDir = "D:\a\${{ env.REPO_NAME }}\Qt\${{env.QT_VERSION}}-shared\mingw810_64"
