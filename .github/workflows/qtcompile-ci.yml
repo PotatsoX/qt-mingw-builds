@@ -87,7 +87,7 @@ jobs:
 
         # 编译、安装
         $numJobs = if ($env:NUMBER_OF_PROCESSORS -and $env:NUMBER_OF_PROCESSORS -gt 0) { $env:NUMBER_OF_PROCESSORS } else { 4 }
-        mingw32-make -j$numJobs
+        mingw32-make -j $numJobs
         mingw32-make install
 
         # 复制qt.conf
