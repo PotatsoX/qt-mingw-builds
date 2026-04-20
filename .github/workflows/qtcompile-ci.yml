@@ -67,7 +67,7 @@ jobs:
 
         # 应用补丁
         $patchFile = "${{github.workspace}}\qfilesystemengine_win.cpp"
-        $destFile = "${{github.workspace}}\Qt\${{env.QT_VERSION}}\qt-everywhere-src-${{env.QT_VERSION}}\qtbase\src\corelib\io\qfilesystemengine_win.cpp"
+        $destFile = "D:\a\${{ env.REPO_NAME }}\Qt\${{env.QT_VERSION}}\qt-everywhere-src-${{env.QT_VERSION}}\qtbase\src\corelib\io\qfilesystemengine_win.cpp"
         Copy-Item -Path $patchFile -Destination $destFile -Force
 
         # 设置Qt源代码目录
