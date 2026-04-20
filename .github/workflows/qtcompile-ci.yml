@@ -45,7 +45,7 @@ jobs:
         while ($attempt -le $maxAttempts -and -not $downloaded) {
           Write-Host "Download attempt $attempt of $maxAttempts"
           curl -L -o 8.1.0-release-posix-seh.7z `
-            "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/tools_mingw81/qt.tools.win64_mingw810/8.1.0-1-202411201005x86_64-8.1.0-gdb-11.2.0-release-win64.7z"
+            "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/tools_mingw81/qt.tools.win64_mingw810/8.1.0-1-202411201005x86_64-8.1.0-gdb-11.2.0-release-posix-seh-rt_v6-rev0.7z"
           
           # Verify file exists and has content
           if ((Test-Path "8.1.0-release-posix-seh.7z") -and ((Get-Item "8.1.0-release-posix-seh.7z").Length -gt 1000000)) {
