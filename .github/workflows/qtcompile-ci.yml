@@ -44,11 +44,15 @@ jobs:
 
     # 安装 Windows SDK (包含 fxc.exe 用于编译 DirectX shaders)
     - name: Setup Windows SDK
-      uses: azure/setup-sdk@v1
-      with:
-        version: 1.0.8
-        use-roslyn: false
-        
+      run: |
+        # 使用 chocolatey 安装 Windows SDK
+        Write-Host "Installing Windows SDK via chocolatey..."
+        choco install windows-sdk-10-version-2004-all -y --no-progress
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Chocolatey install failed, trying alternative..."
+            choco install windows-sdk-10-version-2004-files -y --no-progress
+        }
+
     # 构建Qt
     - name: Build Qt
       run: |
@@ -84,14 +88,24 @@ jobs:
         $env:PATH = "$srcQt\qtbase\bin;$srcQt\gnuwin32\bin;$env:PATH"
         
         # 查找Windows SDK中的fxc.exe并添加到PATH
-        $sdkBinPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Directory -ErrorAction SilentlyContinue | 
-                      Where-Object { $_.Name -match '^10\.' } | 
-                      Sort-Object { [version]($_.Name -replace '^10\.', '') -Descending } | 
-                      Select-Object -First 1 | 
-                      ForEach-Object { Join-Path $_.FullName "x64" }
-        if ($sdkBinPath -and (Test-Path "$sdkBinPath\fxc.exe")) {
-            $env:PATH = "$sdkBinPath;$env:PATH"
-            Write-Host "Added Windows SDK bin to PATH: $sdkBinPath"
+        $sdkBasePath = "C:\Program Files (x86)\Windows Kits\10\bin"
+        $sdkBinPath = $null
+        
+        if (Test-Path $sdkBasePath) {
+            $sdkBinPath = Get-ChildItem -Path $sdkBasePath -Directory |
+                          Where-Object { $_.Name -match '^10\.' } |
+                          Sort-Object { [version]($_.Name -replace '^10\.', '') -Descending } |
+                          Select-Object -First 1 |
+                          ForEach-Object { Join-Path $_.FullName "x64" }
+            
+            if ($sdkBinPath -and (Test-Path "$sdkBinPath\fxc.exe")) {
+                $env:PATH = "$sdkBinPath;$env:PATH"
+                Write-Host "Added Windows SDK bin to PATH: $sdkBinPath"
+            } else {
+                Write-Host "Warning: fxc.exe not found in Windows SDK"
+            }
+        } else {
+            Write-Host "Warning: Windows SDK not found at $sdkBasePath"
         }
 
         # 设置安装文件夹目录
