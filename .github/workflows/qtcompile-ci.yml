@@ -94,7 +94,7 @@ jobs:
         if (Test-Path $sdkBasePath) {
             $sdkBinPath = Get-ChildItem -Path $sdkBasePath -Directory |
                           Where-Object { $_.Name -match '^10\.' } |
-                          Sort-Object { [version]($_.Name -replace '^10\.', '') -Descending } |
+                          Sort-Object -Property { [version]($_.Name -replace '^10\.', '') } -Descending |
                           Select-Object -First 1 |
                           ForEach-Object { Join-Path $_.FullName "x64" }
             
