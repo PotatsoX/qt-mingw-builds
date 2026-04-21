@@ -114,6 +114,16 @@ jobs:
         # 设置build文件夹目录
         $buildDir = "D:\a\${{ env.REPO_NAME }}\Qt\${{env.QT_VERSION}}\build-mingw810_64"
 
+        # 应用 MinGW D3D12 补丁 (来自 Fsu0413)
+        $d3d12File = "$srcQt\qtdeclarative\src\plugins\scenegraph\d3d12\qsgd3d12engine.cpp"
+        if (Test-Path $d3d12File) {
+            # 添加 #include <d3d12sdklayers.h> 在 comdef.h 之后
+            (Get-Content $d3d12File -Raw) -replace '(#include <comdef\.h>)', "$1`n`n#ifdef Q_CC_MINGW`n#include <d3d12sdklayers.h>`n#endif" | Set-Content $d3d12File -NoNewline
+            # 将 _uuidof 替换为 __uuidof
+            (Get-Content $d3d12File -Raw) -replace '_uuidof\(ID3D12Device\)', '__uuidof(ID3D12Device)' | Set-Content $d3d12File -NoNewline
+            Write-Host "Applied MinGW D3D12 patch"
+        }
+
         # 创建并进入构建目录
         if (Test-Path $buildDir) { Remove-Item -Recurse -Force $buildDir }
         New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
